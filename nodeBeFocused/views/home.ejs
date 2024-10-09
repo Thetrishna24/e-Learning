@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeFocused. - Home Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">BeFocused.</div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="login-btn">Login</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <h1>Focusing is an art</h1>
+            <p id="motivational-quote"></p>
+            <button class="cta-btn">Explore Courses</button>
+        </section>
+
+        <% if (courseSections && quotes) { %>
+            <% courseSections.forEach(section => { %>
+                <section id="courses">
+                    <h2><%= section.title %></h2>
+                    <div class="course-grid">
+                        <% section.courses.forEach(course => { %>
+                        <div class="course-card" data-playlist-id="<%= course.id %>">
+                            <div class="thumbnail-container">
+                                <img src="<%= course.thumbnail %>" alt="<%= course.title %> Thumbnail">
+                            </div>
+                            <h3><%= course.title %></h3>
+                            <p><%= course.description.split('.')[0] %></p>
+                            <a href="/playlist/<%= course.id %>" class="course-link">View Course</a>
+                        </div>
+                        <% }); %>
+                    </div>
+                </section>
+            <% }); %>
+        <% } else { %>
+            <p>Error: Course sections or quotes are not defined.</p>
+        <% } %>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 BeFocused. Let's focus.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const quotes = <%- JSON.stringify(quotes) %>; // Fixed duplicate declaration
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('motivational-quote').textContent = randomQuote;
+
+            const loginBtn = document.querySelector('.login-btn');
+            const ctaBtn = document.querySelector('.cta-btn');
+
+            loginBtn.addEventListener('click', () => {
+                alert('Login functionality coming soon!');
+            });
+
+            ctaBtn.addEventListener('click', () => {
+                alert('Explore our wide range of programming courses!');
+            });
+        });
+    </script>
+</body>
+</html>

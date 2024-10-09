@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= playlist.title %> - BeFocused.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">BeFocused.</div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="login-btn">Login</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="video-player">
+            <h2 id="video-title"><%= playlist.title %></h2>
+            <iframe id="video-frame" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+        </section>
+
+        <section id="playlist-videos">
+            <h3>Videos in Playlist</h3>
+            <ul id="video-list">
+                <% videos.forEach((video, index) => { %>
+                <li data-video-id="<%= video.videoId %>">
+                    <img src="<%= video.thumbnail %>" alt="<%= video.title %> Thumbnail">
+                    <div>
+                        <h4><%= video.title %></h4>
+                        <p><%= video.description.split('.')[0] %></p>
+                    </div>
+                </li>
+                <% }); %>
+            </ul>
+        </section>
+
+        <div id="navigation-buttons">
+            <button id="prev-btn">Previous</button>
+            <button id="next-btn">Next</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 BeFocused. Let's focus.</p>
+    </footer>
+
+    <script>
+        let currentVideoIndex = 0;
+        const videos = <%- JSON.stringify(videos) %>;
+
+        function loadVideo(index) {
+            const video = videos[index];
+            if (video) {
+                document.getElementById('video-frame').src = `https://www.youtube.com/embed/${video.videoId}`;
+                document.getElementById('video-title').textContent = video.title;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoList = document.getElementById('video-list');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            videoList.addEventListener('click', (event) => {
+                const listItem = event.target.closest('li');
+                if (listItem) {
+                    const videoId = listItem.dataset.videoId;
+                    currentVideoIndex = videos.findIndex(video => video.videoId === videoId);
+                    loadVideo(currentVideoIndex);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentVideoIndex > 0) {
+                    currentVideoIndex--;
+                    loadVideo(currentVideoIndex);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentVideoIndex < videos.length - 1) {
+                    currentVideoIndex++;
+                    loadVideo(currentVideoIndex);
+                }
+            });
+
+            // Load the first video
+            if (videos.length > 0) {
+                loadVideo(0);
+            }
+        });
+    </script>
+</body>
+</html>
