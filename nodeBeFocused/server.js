@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-const API_KEY = 'AIzaSyDFKB5JicyHNbWBqvCAHoDdNJ-irzc1xSo';
+const API_KEY = API_KEY;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
