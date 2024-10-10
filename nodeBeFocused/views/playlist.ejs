@@ -25,18 +25,25 @@
         <section id="video-player">
             <h2 id="video-title"><%= playlist.title %></h2>
             <iframe id="video-frame" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+            <div id="video-progress">
+                <p>Progress: <span id="completed-videos">0</span>/<span id="total-videos"><%= videos.length %></span> videos completed</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
         </section>
 
         <section id="playlist-videos">
             <h3>Videos in Playlist</h3>
-            <ul id="video-list">
+            <ul id="video-list" style="max-height: 400px; overflow-y: auto;">
                 <% videos.forEach((video, index) => { %>
-                <li data-video-id="<%= video.videoId %>">
+                <li data-video-id="<%= video.videoId %>" data-index="<%= index %>">
                     <img src="<%= video.thumbnail %>" alt="<%= video.title %> Thumbnail">
                     <div>
                         <h4><%= video.title %></h4>
                         <p><%= video.description.split('.')[0] %></p>
                     </div>
+                    <span class="completion-status" data-completed="false">&#10003;</span>
                 </li>
                 <% }); %>
             </ul>
@@ -55,12 +62,41 @@
     <script>
         let currentVideoIndex = 0;
         const videos = <%- JSON.stringify(videos) %>;
+        let completedVideos = 0;
+        const isLoggedIn = false; // This should be set based on the user's login status
 
         function loadVideo(index) {
             const video = videos[index];
             if (video) {
                 document.getElementById('video-frame').src = `https://www.youtube.com/embed/${video.videoId}`;
                 document.getElementById('video-title').textContent = video.title;
+                updateVideoProgress();
+            }
+        }
+
+        function updateVideoProgress() {
+            const completedVideosElement = document.getElementById('completed-videos');
+            const totalVideosElement = document.getElementById('total-videos');
+            const progressFill = document.querySelector('.progress-fill');
+
+            completedVideosElement.textContent = completedVideos;
+            totalVideosElement.textContent = videos.length;
+
+            const progressPercentage = (completedVideos / videos.length) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+
+        function markVideoAsCompleted(index) {
+            if (isLoggedIn) {
+                const videoItem = document.querySelector(`#video-list li[data-index="${index}"]`);
+                const completionStatus = videoItem.querySelector('.completion-status');
+                
+                if (completionStatus.dataset.completed === 'false') {
+                    completionStatus.dataset.completed = 'true';
+                    completionStatus.classList.add('completed');
+                    completedVideos++;
+                    updateVideoProgress();
+                }
             }
         }
 
@@ -73,8 +109,9 @@
                 const listItem = event.target.closest('li');
                 if (listItem) {
                     const videoId = listItem.dataset.videoId;
-                    currentVideoIndex = videos.findIndex(video => video.videoId === videoId);
+                    currentVideoIndex = parseInt(listItem.dataset.index);
                     loadVideo(currentVideoIndex);
+                    markVideoAsCompleted(currentVideoIndex);
                 }
             });
 
@@ -82,6 +119,7 @@
                 if (currentVideoIndex > 0) {
                     currentVideoIndex--;
                     loadVideo(currentVideoIndex);
+                    markVideoAsCompleted(currentVideoIndex);
                 }
             });
 
@@ -89,6 +127,7 @@
                 if (currentVideoIndex < videos.length - 1) {
                     currentVideoIndex++;
                     loadVideo(currentVideoIndex);
+                    markVideoAsCompleted(currentVideoIndex);
                 }
             });
 
